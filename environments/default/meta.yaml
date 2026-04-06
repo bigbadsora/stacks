@@ -1,0 +1,9 @@
+# meta.yaml
+# Stacks package metadata
+# This file describes the zip package itself
+
+name: "My Collection"          # user-defined name for this collection
+version: "1.0.0"               # user's own version of their package
+stacks_version: "0.1.0"        # version of Stacks that generated this zip
+exported_at: ""                # auto-generated timestamp on export, ISO 8601
+author: ""                     # user's name

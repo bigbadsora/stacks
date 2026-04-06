@@ -1,0 +1,9 @@
+# theme.yaml
+# Stacks visual theme configuration
+# Theming is not implemented in v0.1
+# This file is a placeholder to ensure the zip format is correct
+# and import logic can handle it gracefully
+
+version: "0.1.0"               # stacks version this theme was created for
+
+# theme configuration will be defined here in a future version
