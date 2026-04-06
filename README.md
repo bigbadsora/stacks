@@ -22,9 +22,8 @@ Because it's a static file, Stacks works:
 ## Getting started
 
 1. Download or clone this repo
-2. Drop `jszip.min.js` and `js-yaml.min.js` into the `vendor/` folder (see [Dependencies](#dependencies))
-3. Open `index.html` in your browser
-4. Click **Load Default** to explore with a sample short stories collection, or **Import Package** to load your own
+2. Open `index.html` in your browser
+3. Click **Load Default** to explore with a sample short stories collection, or **Import Package** to load your own
 
 ---
 
@@ -104,14 +103,14 @@ There are two export options:
 
 ## Dependencies
 
-Stacks vendors two small libraries that you need to download and place in the `vendor/` folder:
+Stacks depends on two small vendored libraries that are included in the repo:
 
-| Library | Version | URL |
+| Library | Version | License |
 |---|---|---|
-| JSZip | 3.10.1 | https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js |
-| js-yaml | 4.1.0 | https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js |
+| JSZip | 3.10.1 | MIT |
+| js-yaml | 4.1.0 | MIT |
 
-These are not bundled in the repo to keep the source clean. Save each file to `vendor/jszip.min.js` and `vendor/js-yaml.min.js` respectively.
+Both are included in the `vendor/` folder. No installation or package manager required.
 
 ---
 
