@@ -115,7 +115,7 @@ async function loadPackage(file) {
   }
 
 
-  return { meta, schema, theme, data, fileFolder, warnings };
+  return { meta, schema, theme, data, filesInFolder, warnings };
 }
 
 
