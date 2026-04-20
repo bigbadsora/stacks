@@ -4,7 +4,7 @@
 
 const MAX_SCHEMA_FIELDS = 10; // configurable - remove or raise this limit in a future version
 
-const VALID_TYPES = ["string", "number", "list", "embed"];
+const VALID_TYPES = ["string", "number", "list"];
 
 const REQUIRED_SCHEMA_KEYS = ["name", "version", "id", "fields"];
 
@@ -133,7 +133,6 @@ function validateRecord(raw, schema) {
         );
       }
       validatedFields[fieldDef.id] = fieldDef.type === "list" ? [] : "";
-      validatedFields[fieldDef.id] = fieldDef.type === "embed" ? {} : "";
       continue;
     }
 
@@ -191,14 +190,6 @@ function coerceFieldValue(value, expectedType) {
       if (Array.isArray(value)) return { value, warned: false };
       if (typeof value === "string") return { value: [value], warned: true };
       return { value: [String(value)], warned: true };
-
-    case "embed":
-      console.log(typeof value)
-      if (typeof value === "object") {
-        if (typeof value.fileType === "string") return { value, warned: false };
-        if (typeof value.path === "string") return { value, warned: false };
-      }
-      return { value: Object(value), warned: true };
 
     default:
       return { value: String(value), warned: true };

@@ -233,12 +233,6 @@ function renderCard(record, schema, query) {
       </div>`;
     }
 
-    if (f.type === "embed"){
-    return `<div class="card-field">
-      <span><${highlight(String(value.fileType), query)} controls src="${highlight(String(value.path), query)}"></span>
-    </div>`;
-    }
-
     return `<div class="card-field">
       <span class="field-label">${esc(f.name)}</span>
       <span class="field-value">${highlight(String(value), query)}</span>
