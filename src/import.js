@@ -99,9 +99,25 @@ async function loadPackage(file) {
   } catch (err) {
     throw new Error(`Could not parse or validate data.json. (${err.message})`);
   }
+  // ── Step 7: Check for files folder inside Stacks package ──
+  let fileFolder;
+  try {
+  const fileFolder = zip.folder(`${meta.fileDirectory}`);
 
-  return { meta, schema, theme, data, warnings };
+  const filesInFolder = Object.values(fileFolder.files).filter(file => {
+  return !file.dir &&                           // not a folder
+         file.name.startsWith(fileFolder.root); // starts with "files/"
+  });
+
+  console.log("Files inside files/ folder:", filesInFolder);
+  } catch (err){
+     throw new Error(`Could not correct import folder. (${err.message})`);
+  }
+
+
+  return { meta, schema, theme, data, fileFolder, warnings };
 }
+
 
 // ─────────────────────────────────────────────
 // loadDefaultPackage
