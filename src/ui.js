@@ -34,12 +34,23 @@ function renderLanding() {
         <h1 class="landing-title">Stacks</h1>
         <p class="landing-tagline">A portable archive for your personal collections.<br>Your data lives in a zip file on your own device.</p>
         <div class="landing-actions">
-          <button class="btn-primary" id="importBtn">Import Package</button>
-          <button class="btn-secondary" id="loadDefaultBtn">Load Default</button>
+          <button class="btn-primary" id="importBtn">Import .zip Package</button>
+          <div class="sample-picker-wrap">
+            <button class="btn-secondary" id="sampleBtn">Load Sample ▾</button>
+            <div class="sample-dropdown" id="sampleDropdown" style="display:none">
+              ${STACKS_SAMPLES.map(s => `
+                <button class="sample-option" data-sample-id="${s.id}">
+                  <span class="sample-option-name">${esc(s.name)}</span>
+                  <span class="sample-option-desc">${esc(s.description)}</span>
+                </button>
+              `).join("")}
+            </div>
+          </div>
         </div>
-        <input type="file" id="importFile" accept=".zip" style="display:none">
+        <p class="landing-hint">Import a <code>.zip</code> Stacks package, or load a sample collection to explore.</p>
       </div>
     </div>
+    <input type="file" id="importFile" accept=".zip" style="display:none">
   `;
 }
 
@@ -62,10 +73,28 @@ function bindLandingEvents() {
     e.target.value = "";
   });
 
-  document.getElementById("loadDefaultBtn").addEventListener("click", () => {
+  // Sample picker toggle
+  document.getElementById("sampleBtn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    const dropdown = document.getElementById("sampleDropdown");
+    dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+  });
+
+  // Close dropdown if clicking outside
+  document.addEventListener("click", () => {
+    const dropdown = document.getElementById("sampleDropdown");
+    if (dropdown) dropdown.style.display = "none";
+  }, { once: true });
+
+  // Sample selection
+  document.getElementById("sampleDropdown").addEventListener("click", (e) => {
+    const btn = e.target.closest(".sample-option");
+    if (!btn) return;
+    const id = btn.dataset.sampleId;
+    const sample = STACKS_SAMPLES.find(s => s.id === id);
+    if (!sample) return;
     try {
-      const pkg = loadDefaultPackage();
-      store.set(pkg);
+      store.set(structuredClone(sample));
       renderMain();
       bindMainEvents();
     } catch (err) {
@@ -577,7 +606,7 @@ function renderWarningsBanner(warnings) {
 function renderSessionToast() {
   return `
     <div class="session-toast" id="sessionToast">
-      <span><strong>Warning</strong> — your changes live in this tab. Export a backup before you go.</span>
+      <span><strong>Stacks</strong> — your changes live in this tab. Export a backup before you go.</span>
       <button class="session-toast-close" id="sessionToastClose" title="Dismiss">✕</button>
     </div>
   `;
