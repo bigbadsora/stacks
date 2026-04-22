@@ -1,9 +1,9 @@
 # schema.yaml
-# Stacks collection schema — Book Collection
+# Stacks schema — Books
 
-name: "Book Collection"
+name: "Books"
 version: "1.0.0"
-id: "book-collection-v1"
+id: "book-stack-v1"
 
 fields:
   - id: "title"

@@ -1,7 +1,7 @@
 # meta.yaml
 # Stacks package metadata
 
-name: "Movie Collection"
+name: "Movies"
 version: "1.0.0"
 stacks_version: "0.1.0"
 exported_at: ""

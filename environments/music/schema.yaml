@@ -1,9 +1,9 @@
 # schema.yaml
-# Stacks collection schema — Music Collection
+# Stacks schema — Music
 
-name: "Music Collection"
+name: "Music"
 version: "1.0.0"
-id: "music-collection-v1"
+id: "music-stack-v1"
 
 fields:
   - id: "title"
