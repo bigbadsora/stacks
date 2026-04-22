@@ -11,28 +11,34 @@ fields:                        # up to 10 field definitions
     name: "Title"              # human readable display label
     type: "string"             # string | number | list
     required: true
+    sortable: true
 
   - id: "author"
     name: "Author"
     type: "string"
     required: true
+    sortable: true
 
   - id: "year"
     name: "Year"
     type: "number"
     required: false
+    sortable: true
 
   - id: "appears-in"
     name: "Appears In"
     type: "string"
     required: false
+    sortable: false
 
   - id: "themes"
     name: "Themes"
     type: "list"
     required: false
+    sortable: false
 
   - id: "notes"
     name: "Notes"
     type: "string"
     required: false
+    sortable: false

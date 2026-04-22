@@ -143,6 +143,22 @@ body {
 
 .search-wrap { flex: 1; }
 
+.sort-select {
+  padding: 8px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  white-space: nowrap;
+}
+
+.sort-select:focus { border-color: var(--accent); }
+
 .search-input {
   width: 100%;
   padding: 8px 12px;
@@ -337,7 +353,6 @@ input.input-error { border-color: var(--accent); background: #fff5f5; }
   padding: 0.875rem 1rem;
   position: relative;
   transition: border-left-color 0.15s, box-shadow 0.15s;
-  margin-bottom: 5px;
 }
 
 .card:hover {

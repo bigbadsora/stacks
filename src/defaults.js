@@ -19,12 +19,12 @@ const STACKS_DEFAULT_PACKAGE = {
     version: "1.0.0",
     id: "short-stories-v1",
     fields: [
-      { id: "title",      name: "Title",      type: "string", required: true  },
-      { id: "author",     name: "Author",     type: "string", required: true  },
-      { id: "year",       name: "Year",       type: "number", required: false },
-      { id: "appears-in", name: "Appears In", type: "string", required: false },
-      { id: "themes",     name: "Themes",     type: "list",   required: false },
-      { id: "notes",      name: "Notes",      type: "string", required: false },
+      { id: "title",      name: "Title",      type: "string", required: true,  sortable: true  },
+      { id: "author",     name: "Author",     type: "string", required: true,  sortable: true  },
+      { id: "year",       name: "Year",       type: "number", required: false, sortable: true  },
+      { id: "appears-in", name: "Appears In", type: "string", required: false, sortable: false },
+      { id: "themes",     name: "Themes",     type: "list",   required: false, sortable: false },
+      { id: "notes",      name: "Notes",      type: "string", required: false, sortable: false },
     ],
   },
 

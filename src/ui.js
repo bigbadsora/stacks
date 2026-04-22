@@ -11,6 +11,8 @@ let _activeFilter = "all";
 let _editingId    = null;
 let _currentPage  = 1;
 let _pageSize     = 10;
+let _sortKey      = "created_at";
+let _sortDir      = "desc";
 
 // ─────────────────────────────────────────────
 // init
@@ -104,6 +106,7 @@ function renderMain() {
         <div class="search-wrap">
           <input class="search-input" id="searchInput" placeholder="Search…" autocomplete="off" value="${esc(_searchQuery)}">
         </div>
+        ${renderSortDropdown(schema)}
         <button class="btn-primary" id="addBtn">+ Add</button>
       </div>
 
@@ -144,6 +147,15 @@ function bindMainEvents() {
     _currentPage = 1;
     document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
+    renderCards();
+  });
+
+  // Sort
+  document.getElementById("sortSelect").addEventListener("change", (e) => {
+    const [key, dir] = e.target.value.split("|");
+    _sortKey = key;
+    _sortDir = dir;
+    _currentPage = 1;
     renderCards();
   });
 
@@ -195,9 +207,46 @@ function bindMainEvents() {
     _activeFilter = "all";
     _editingId    = null;
     _currentPage  = 1;
+    _sortKey      = "created_at";
+    _sortDir      = "desc";
     renderLanding();
     bindLandingEvents();
   });
+}
+
+// ══════════════════════════════════════════════
+// SORT
+// ══════════════════════════════════════════════
+
+function renderSortDropdown(schema) {
+  const dateOptions = `
+    <option value="created_at|desc" ${_sortKey === "created_at" && _sortDir === "desc" ? "selected" : ""}>Date added (newest)</option>
+    <option value="created_at|asc"  ${_sortKey === "created_at" && _sortDir === "asc"  ? "selected" : ""}>Date added (oldest)</option>
+  `;
+
+  const fieldOptions = schema.fields.map(f => {
+    if (f.type === "list") {
+      return `<option disabled>${esc(f.name)} (not sortable)</option>`;
+    }
+    if (!f.sortable) return "";
+    if (f.type === "number") {
+      return `
+        <option value="${esc(f.id)}|asc"  ${_sortKey === f.id && _sortDir === "asc"  ? "selected" : ""}>${esc(f.name)} (asc)</option>
+        <option value="${esc(f.id)}|desc" ${_sortKey === f.id && _sortDir === "desc" ? "selected" : ""}>${esc(f.name)} (desc)</option>
+      `;
+    }
+    return `
+      <option value="${esc(f.id)}|asc"  ${_sortKey === f.id && _sortDir === "asc"  ? "selected" : ""}>${esc(f.name)} (A–Z)</option>
+      <option value="${esc(f.id)}|desc" ${_sortKey === f.id && _sortDir === "desc" ? "selected" : ""}>${esc(f.name)} (Z–A)</option>
+    `;
+  }).join("");
+
+  return `
+    <select class="sort-select" id="sortSelect">
+      ${dateOptions}
+      ${fieldOptions}
+    </select>
+  `;
 }
 
 // ══════════════════════════════════════════════
@@ -224,17 +273,37 @@ function renderCards() {
 
   empty.style.display = "none";
 
+  // Sort
+  const sorted = [...filtered].sort((a, b) => {
+    let aVal, bVal;
+    if (_sortKey === "created_at" || _sortKey === "updated_at") {
+      aVal = a[_sortKey] || "";
+      bVal = b[_sortKey] || "";
+    } else {
+      aVal = a.fields[_sortKey] ?? "";
+      bVal = b.fields[_sortKey] ?? "";
+    }
+    if (typeof aVal === "number" && typeof bVal === "number") {
+      return _sortDir === "asc" ? aVal - bVal : bVal - aVal;
+    }
+    aVal = String(aVal).toLowerCase();
+    bVal = String(bVal).toLowerCase();
+    if (aVal < bVal) return _sortDir === "asc" ? -1 : 1;
+    if (aVal > bVal) return _sortDir === "asc" ? 1 : -1;
+    return 0;
+  });
+
   // Paginate
-  const totalPages = _pageSize === 0 ? 1 : Math.ceil(filtered.length / _pageSize);
+  const totalPages = _pageSize === 0 ? 1 : Math.ceil(sorted.length / _pageSize);
   if (_currentPage > totalPages) _currentPage = totalPages;
 
   const paginated = _pageSize === 0
-    ? filtered
-    : filtered.slice((_currentPage - 1) * _pageSize, _currentPage * _pageSize);
+    ? sorted
+    : sorted.slice((_currentPage - 1) * _pageSize, _currentPage * _pageSize);
 
   list.innerHTML = paginated.map(record => renderCard(record, schema, query)).join("");
 
-  renderPagination(filtered.length, totalPages);
+  renderPagination(sorted.length, totalPages);
 }
 
 function renderCard(record, schema, query) {
