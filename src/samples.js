@@ -72,10 +72,10 @@ const STACKS_SAMPLES = [
 
   {
     id: "music",
-    name: "Music Collection",
+    name: "Music",
     description: "Catalogue your vinyl, CDs, cassettes, and digital albums.",
     meta: {
-      name: "Music Collection",
+      name: "Music",
       version: "1.0.0",
       stacks_version: "0.1.0",
       exported_at: "",
@@ -159,10 +159,10 @@ const STACKS_SAMPLES = [
 
   {
     id: "movies",
-    name: "Movie Collection",
+    name: "Movies",
     description: "Index your DVDs, Blu-rays, VHS tapes, and digital films.",
     meta: {
-      name: "Movie Collection",
+      name: "Movies",
       version: "1.0.0",
       stacks_version: "0.1.0",
       exported_at: "",
@@ -246,10 +246,10 @@ const STACKS_SAMPLES = [
 
   {
     id: "games",
-    name: "Video Game Collection",
+    name: "Video Games",
     description: "Track your game library by platform, status, and condition.",
     meta: {
-      name: "Video Game Collection",
+      name: "Video Games",
       version: "1.0.0",
       stacks_version: "0.1.0",
       exported_at: "",
@@ -337,10 +337,10 @@ const STACKS_SAMPLES = [
 
   {
     id: "books",
-    name: "Book Collection",
+    name: "Books",
     description: "Catalogue your books by format, genre, and reading status.",
     meta: {
-      name: "Book Collection",
+      name: "Books",
       version: "1.0.0",
       stacks_version: "0.1.0",
       exported_at: "",
