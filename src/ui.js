@@ -103,6 +103,7 @@ function renderMain() {
     <div class="main-body">
 
       ${renderWarningsBanner(state.warnings)}
+      ${renderSessionToast()}
 
       <div class="toolbar">
         <div class="search-wrap">
@@ -203,7 +204,7 @@ function bindMainEvents() {
 
   // Unload
   document.getElementById("unloadBtn").addEventListener("click", () => {
-    if (!confirm("Unload this collection? Make sure you have exported a backup first.")) return;
+    if (!confirm("Unload this collection? Make sure you have exported a backup first — any changes made this session will be lost.")) return;
     store.clear();
     _searchQuery  = "";
     _activeFilter = "all";
@@ -214,6 +215,8 @@ function bindMainEvents() {
     renderLanding();
     bindLandingEvents();
   });
+
+  bindSessionToast();
 }
 
 // ══════════════════════════════════════════════
@@ -569,6 +572,35 @@ function renderWarningsBanner(warnings) {
       <ul>${warnings.map(w => `<li>${esc(w)}</li>`).join("")}</ul>
     </div>
   `;
+}
+
+function renderSessionToast() {
+  return `
+    <div class="session-toast" id="sessionToast">
+      <span><strong>Warning</strong> — your changes live in this tab. Export a backup before you go.</span>
+      <button class="session-toast-close" id="sessionToastClose" title="Dismiss">✕</button>
+    </div>
+  `;
+}
+
+function bindSessionToast() {
+  const toast = document.getElementById("sessionToast");
+  const close = document.getElementById("sessionToastClose");
+  if (!toast || !close) return;
+
+  // Auto-dismiss after 6 seconds
+  const timer = setTimeout(() => dismissToast(toast), 6000);
+
+  close.addEventListener("click", () => {
+    clearTimeout(timer);
+    dismissToast(toast);
+  });
+}
+
+function dismissToast(toast) {
+  toast.style.opacity = "0";
+  toast.style.transition = "opacity 0.4s";
+  setTimeout(() => toast.remove(), 400);
 }
 
 function showError(message) {

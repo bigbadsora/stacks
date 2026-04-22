@@ -460,6 +460,41 @@ mark.highlight {
   padding: 0 1px;
 }
 
+/* ── Session toast ── */
+.session-toast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--stamp, #4a3520);
+  color: var(--paper, #f5f0e8);
+  border-radius: var(--radius);
+  padding: 0.65rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  animation: fadeInDown 0.3s ease;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.session-toast-close {
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 2px 4px;
+  flex-shrink: 0;
+  border-radius: var(--radius);
+  transition: opacity 0.12s;
+}
+
+.session-toast-close:hover { opacity: 1; }
+
 /* ── Warnings banner ── */
 .warnings-banner {
   background: #fffbeb;
