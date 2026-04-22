@@ -25,7 +25,23 @@ Because it's a static file, Stacks works:
 
 1. Download or clone this repo
 2. Open `index.html` in your browser
-3. Click **Load Default** to explore with a sample short stories collection, or **Import Package** to load your own
+3. Click **Load Sample** to explore with a sample collection, or **Import .zip Package** to load your own
+
+---
+
+## Sample environments
+
+Stacks includes five sample environments to help you get started or explore what's possible. Load any of them from the landing page using the **Load Sample** button.
+
+| Sample | Description |
+|---|---|
+| Short Stories | Track short fiction by title, author, theme, and where you have it |
+| Music | Catalogue vinyl, CDs, cassettes, and digital albums |
+| Movies | Index DVDs, Blu-rays, VHS tapes, and digital films |
+| Video Games | Track your game library by platform, status, and condition |
+| Books | Catalogue books by format, genre, and reading status |
+
+Downloadable `.zip` packages for each environment are available in the `environments/` folder of this repo. Import any of them to start with a pre-configured schema and a few sample records.
 
 ---
 
@@ -126,8 +142,8 @@ A Stacks package is a zip file containing all four files at the root level — n
 
 There are two export options:
 
-- **Export Full Backup** — exports a complete package zip with your data and configuration. Use this to save your work.
-- **Export Shareable Environment** — exports schema, theme, and meta only, with no data. Use this to share your collection setup as a preset for others.
+- **Export Full Backup** — exports a complete package zip with your data and configuration. Filename format: `my-collection-stack.zip`. Use this to save your work.
+- **Export Shareable Environment** — exports schema, theme, and meta only, with no data. Filename format: `my-collection-stack-env.zip`. Use this to share your collection setup as a preset for others.
 
 ---
 
