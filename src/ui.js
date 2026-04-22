@@ -6,9 +6,11 @@
 // ─────────────────────────────────────────────
 // Internal UI state
 // ─────────────────────────────────────────────
-let _searchQuery = "";
+let _searchQuery  = "";
 let _activeFilter = "all";
-let _editingId = null;
+let _editingId    = null;
+let _currentPage  = 1;
+let _pageSize     = 10;
 
 // ─────────────────────────────────────────────
 // init
@@ -118,6 +120,7 @@ function renderMain() {
 
       <div class="card-list" id="cardList"></div>
       <div class="empty-state" id="emptyState" style="display:none">No records found.</div>
+      <div class="pagination" id="pagination"></div>
 
     </div>
   `;
@@ -129,6 +132,7 @@ function bindMainEvents() {
   // Search
   document.getElementById("searchInput").addEventListener("input", (e) => {
     _searchQuery = e.target.value;
+    _currentPage = 1;
     renderCards();
   });
 
@@ -137,6 +141,7 @@ function bindMainEvents() {
     const tab = e.target.closest(".filter-tab");
     if (!tab) return;
     _activeFilter = tab.dataset.filter;
+    _currentPage = 1;
     document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
     renderCards();
@@ -186,9 +191,10 @@ function bindMainEvents() {
   document.getElementById("unloadBtn").addEventListener("click", () => {
     if (!confirm("Unload this collection? Make sure you have exported a backup first.")) return;
     store.clear();
-    _searchQuery = "";
+    _searchQuery  = "";
     _activeFilter = "all";
-    _editingId = null;
+    _editingId    = null;
+    _currentPage  = 1;
     renderLanding();
     bindLandingEvents();
   });
@@ -206,17 +212,29 @@ function renderCards() {
 
   document.getElementById("recordCount").textContent = state.data.records.length;
 
-  const list = document.getElementById("cardList");
+  const list  = document.getElementById("cardList");
   const empty = document.getElementById("emptyState");
 
   if (filtered.length === 0) {
     list.innerHTML = "";
     empty.style.display = "block";
+    document.getElementById("pagination").innerHTML = "";
     return;
   }
 
   empty.style.display = "none";
-  list.innerHTML = filtered.map(record => renderCard(record, schema, query)).join("");
+
+  // Paginate
+  const totalPages = _pageSize === 0 ? 1 : Math.ceil(filtered.length / _pageSize);
+  if (_currentPage > totalPages) _currentPage = totalPages;
+
+  const paginated = _pageSize === 0
+    ? filtered
+    : filtered.slice((_currentPage - 1) * _pageSize, _currentPage * _pageSize);
+
+  list.innerHTML = paginated.map(record => renderCard(record, schema, query)).join("");
+
+  renderPagination(filtered.length, totalPages);
 }
 
 function renderCard(record, schema, query) {
@@ -255,6 +273,62 @@ function renderCard(record, schema, query) {
       </div>
     </div>
   `;
+}
+
+// ══════════════════════════════════════════════
+// PAGINATION
+// ══════════════════════════════════════════════
+
+function renderPagination(totalFiltered, totalPages) {
+  const container = document.getElementById("pagination");
+
+  const pageInfo = _pageSize === 0
+    ? `Showing all ${totalFiltered} records`
+    : `Page ${_currentPage} of ${totalPages} · ${totalFiltered} records`;
+
+  const prevDisabled = _currentPage <= 1 || _pageSize === 0;
+  const nextDisabled = _currentPage >= totalPages || _pageSize === 0;
+
+  container.innerHTML = `
+    <div class="pagination-inner">
+      <div class="pagination-controls">
+        <button class="btn-small" id="prevPageBtn" ${prevDisabled ? "disabled" : ""}>← Prev</button>
+        <span class="pagination-info">${pageInfo}</span>
+        <button class="btn-small" id="nextPageBtn" ${nextDisabled ? "disabled" : ""}>Next →</button>
+      </div>
+      <div class="pagination-size">
+        <label for="pageSizeSelect">Per page</label>
+        <select id="pageSizeSelect">
+          <option value="10"  ${_pageSize === 10  ? "selected" : ""}>10</option>
+          <option value="25"  ${_pageSize === 25  ? "selected" : ""}>25</option>
+          <option value="50"  ${_pageSize === 50  ? "selected" : ""}>50</option>
+          <option value="0"   ${_pageSize === 0   ? "selected" : ""}>All</option>
+        </select>
+      </div>
+    </div>
+  `;
+
+  if (!prevDisabled) {
+    document.getElementById("prevPageBtn").addEventListener("click", () => {
+      _currentPage--;
+      renderCards();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  if (!nextDisabled) {
+    document.getElementById("nextPageBtn").addEventListener("click", () => {
+      _currentPage++;
+      renderCards();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  document.getElementById("pageSizeSelect").addEventListener("change", (e) => {
+    _pageSize = parseInt(e.target.value);
+    _currentPage = 1;
+    renderCards();
+  });
 }
 
 // ══════════════════════════════════════════════
