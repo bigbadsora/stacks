@@ -1,0 +1,57 @@
+{
+  "total_records": 3,
+  "last_updated": "2026-04-22T00:00:00Z",
+  "records": [
+    {
+      "id": "game001",
+      "schema_id": "games-collection-v1",
+      "created_at": "2026-04-22T00:00:00Z",
+      "updated_at": "2026-04-22T00:00:00Z",
+      "fields": {
+        "title": "Disco Elysium",
+        "developer": "ZA/UM",
+        "year": 2019,
+        "platform": "PC",
+        "format": "Digital",
+        "genre": ["RPG", "detective"],
+        "condition": "",
+        "status": "Completed",
+        "notes": "One of the most original RPGs ever made."
+      }
+    },
+    {
+      "id": "game002",
+      "schema_id": "games-collection-v1",
+      "created_at": "2026-04-22T00:00:00Z",
+      "updated_at": "2026-04-22T00:00:00Z",
+      "fields": {
+        "title": "Castlevania: Symphony of the Night",
+        "developer": "Konami",
+        "year": 1997,
+        "platform": "PS1",
+        "format": "Physical",
+        "genre": ["action", "platformer", "metroidvania"],
+        "condition": "Good",
+        "status": "Completed",
+        "notes": "What is a man? A miserable little pile of secrets."
+      }
+    },
+    {
+      "id": "game003",
+      "schema_id": "games-collection-v1",
+      "created_at": "2026-04-22T00:00:00Z",
+      "updated_at": "2026-04-22T00:00:00Z",
+      "fields": {
+        "title": "Elden Ring",
+        "developer": "FromSoftware",
+        "year": 2022,
+        "platform": "PS5",
+        "format": "Physical",
+        "genre": ["action RPG", "soulslike", "open world"],
+        "condition": "Mint",
+        "status": "Playing",
+        "notes": "Send help."
+      }
+    }
+  ]
+}

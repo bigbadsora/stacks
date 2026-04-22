@@ -1,0 +1,8 @@
+# meta.yaml
+# Stacks package metadata
+
+name: "Book Collection"
+version: "1.0.0"
+stacks_version: "0.1.0"
+exported_at: ""
+author: ""

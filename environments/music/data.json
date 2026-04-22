@@ -1,0 +1,54 @@
+{
+  "total_records": 3,
+  "last_updated": "2026-04-22T00:00:00Z",
+  "records": [
+    {
+      "id": "music001",
+      "schema_id": "music-collection-v1",
+      "created_at": "2026-04-22T00:00:00Z",
+      "updated_at": "2026-04-22T00:00:00Z",
+      "fields": {
+        "title": "Kind of Blue",
+        "artist": "Miles Davis",
+        "year": 1959,
+        "format": "Vinyl",
+        "genre": ["jazz", "modal jazz"],
+        "label": "Columbia",
+        "condition": "Good",
+        "notes": "One of the best selling jazz albums of all time."
+      }
+    },
+    {
+      "id": "music002",
+      "schema_id": "music-collection-v1",
+      "created_at": "2026-04-22T00:00:00Z",
+      "updated_at": "2026-04-22T00:00:00Z",
+      "fields": {
+        "title": "Remain in Light",
+        "artist": "Talking Heads",
+        "year": 1980,
+        "format": "CD",
+        "genre": ["new wave", "art rock", "funk"],
+        "label": "Sire",
+        "condition": "Mint",
+        "notes": "Produced with Brian Eno."
+      }
+    },
+    {
+      "id": "music003",
+      "schema_id": "music-collection-v1",
+      "created_at": "2026-04-22T00:00:00Z",
+      "updated_at": "2026-04-22T00:00:00Z",
+      "fields": {
+        "title": "Dummy",
+        "artist": "Portishead",
+        "year": 1994,
+        "format": "Cassette",
+        "genre": ["trip-hop", "electronic"],
+        "label": "Go! Discs",
+        "condition": "Fair",
+        "notes": "Debut album. Glory Box is worth the price alone."
+      }
+    }
+  ]
+}
