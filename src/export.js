@@ -35,7 +35,7 @@ async function exportData() {
   zip.file("theme.yaml",  jsyaml.dump(state.theme,   { lineWidth: -1 }));
   zip.file("data.json",   JSON.stringify(data, null, 2));
 
-  await triggerDownload(zip, buildFilename(meta.name, "stacks"));
+  await triggerDownload(zip, buildFilename(meta.name, "stack"));
 }
 
 // ─────────────────────────────────────────────
@@ -64,7 +64,7 @@ async function exportEnvironment() {
   };
   zip.file("data.json", JSON.stringify(emptyData, null, 2));
 
-  await triggerDownload(zip, buildFilename(meta.name, "stacks-env"));
+  await triggerDownload(zip, buildFilename(meta.name, "stack-env"));
 }
 
 // ─────────────────────────────────────────────

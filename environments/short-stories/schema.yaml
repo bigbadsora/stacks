@@ -1,38 +1,44 @@
 # schema.yaml
-# Stacks collection schema
+# Stacks schema
 # Defines the structure of every record in data.json
 
 name: "Short Stories"          # human readable name for this collection type
 version: "1.0.0"               # user's own version of this schema
-id: "short-stories-v1"         # machine readable unique identifier for this schema
+id: "short-stories-stack-v1"         # machine readable unique identifier for this schema
 
 fields:                        # up to 10 field definitions
   - id: "title"                # machine readable, alphanumeric and dashes only
     name: "Title"              # human readable display label
     type: "string"             # string | number | list
     required: true
+    sortable: true
 
   - id: "author"
     name: "Author"
     type: "string"
     required: true
+    sortable: true
 
   - id: "year"
     name: "Year"
     type: "number"
     required: false
+    sortable: true
 
   - id: "appears-in"
     name: "Appears In"
     type: "string"
     required: false
+    sortable: false
 
   - id: "themes"
     name: "Themes"
     type: "list"
     required: false
+    sortable: false
 
   - id: "notes"
     name: "Notes"
     type: "string"
     required: false
+    sortable: false

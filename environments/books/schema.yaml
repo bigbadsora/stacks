@@ -1,0 +1,55 @@
+# schema.yaml
+# Stacks schema — Books
+
+name: "Books"
+version: "1.0.0"
+id: "book-stack-v1"
+
+fields:
+  - id: "title"
+    name: "Title"
+    type: "string"
+    required: true
+    sortable: true
+
+  - id: "author"
+    name: "Author"
+    type: "string"
+    required: true
+    sortable: true
+
+  - id: "year"
+    name: "Year"
+    type: "number"
+    required: false
+    sortable: true
+
+  - id: "genre"
+    name: "Genre"
+    type: "list"
+    required: false
+    sortable: false
+
+  - id: "format"
+    name: "Format"
+    type: "string"
+    required: false
+    sortable: true
+
+  - id: "publisher"
+    name: "Publisher"
+    type: "string"
+    required: false
+    sortable: false
+
+  - id: "status"
+    name: "Status"
+    type: "string"
+    required: false
+    sortable: true
+
+  - id: "notes"
+    name: "Notes"
+    type: "string"
+    required: false
+    sortable: false

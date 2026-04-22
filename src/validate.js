@@ -75,12 +75,24 @@ function validateSchema(raw) {
       field.required = false;
     }
 
+    if (typeof field.sortable !== "boolean") {
+      field.sortable = false;
+    }
+
+    if (field.sortable && field.type === "list") {
+      fieldWarnings.push(
+        `Field "${field.id}" is a list type and cannot be sorted. "sortable" will be ignored.`
+      );
+      field.sortable = false;
+    }
+
     warnings.push(...fieldWarnings);
     validatedFields.push({
       id: field.id,
       name: field.name,
       type: field.type,
       required: field.required,
+      sortable: field.sortable,
     });
   }
 

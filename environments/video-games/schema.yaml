@@ -1,0 +1,61 @@
+# schema.yaml
+# Stacks schema — Video Games
+
+name: "Video Games"
+version: "1.0.0"
+id: "games-stack-v1"
+
+fields:
+  - id: "title"
+    name: "Title"
+    type: "string"
+    required: true
+    sortable: true
+
+  - id: "developer"
+    name: "Developer"
+    type: "string"
+    required: false
+    sortable: true
+
+  - id: "year"
+    name: "Year"
+    type: "number"
+    required: false
+    sortable: true
+
+  - id: "platform"
+    name: "Platform"
+    type: "string"
+    required: false
+    sortable: true
+
+  - id: "format"
+    name: "Format"
+    type: "string"
+    required: false
+    sortable: false
+
+  - id: "genre"
+    name: "Genre"
+    type: "list"
+    required: false
+    sortable: false
+
+  - id: "condition"
+    name: "Condition"
+    type: "string"
+    required: false
+    sortable: true
+
+  - id: "status"
+    name: "Status"
+    type: "string"
+    required: false
+    sortable: true
+
+  - id: "notes"
+    name: "Notes"
+    type: "string"
+    required: false
+    sortable: false

@@ -6,9 +6,13 @@
 // ─────────────────────────────────────────────
 // Internal UI state
 // ─────────────────────────────────────────────
-let _searchQuery = "";
+let _searchQuery  = "";
 let _activeFilter = "all";
-let _editingId = null;
+let _editingId    = null;
+let _currentPage  = 1;
+let _pageSize     = 10;
+let _sortKey      = "created_at";
+let _sortDir      = "desc";
 
 // ─────────────────────────────────────────────
 // init
@@ -30,12 +34,23 @@ function renderLanding() {
         <h1 class="landing-title">Stacks</h1>
         <p class="landing-tagline">A portable archive for your personal collections.<br>Your data lives in a zip file on your own device.</p>
         <div class="landing-actions">
-          <button class="btn-primary" id="importBtn">Import Package</button>
-          <button class="btn-secondary" id="loadDefaultBtn">Load Default</button>
+          <button class="btn-primary" id="importBtn">Import .zip Package</button>
+          <div class="sample-picker-wrap">
+            <button class="btn-secondary" id="sampleBtn">Load Sample ▾</button>
+            <div class="sample-dropdown" id="sampleDropdown" style="display:none">
+              ${STACKS_SAMPLES.map(s => `
+                <button class="sample-option" data-sample-id="${s.id}">
+                  <span class="sample-option-name">${esc(s.name)}</span>
+                  <span class="sample-option-desc">${esc(s.description)}</span>
+                </button>
+              `).join("")}
+            </div>
+          </div>
         </div>
-        <input type="file" id="importFile" accept=".zip" style="display:none">
+        <p class="landing-hint">Import a <code>.zip</code> Stacks package, or load a sample collection to explore.</p>
       </div>
     </div>
+    <input type="file" id="importFile" accept=".zip" style="display:none">
   `;
 }
 
@@ -58,10 +73,28 @@ function bindLandingEvents() {
     e.target.value = "";
   });
 
-  document.getElementById("loadDefaultBtn").addEventListener("click", () => {
+  // Sample picker toggle
+  document.getElementById("sampleBtn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    const dropdown = document.getElementById("sampleDropdown");
+    dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+  });
+
+  // Close dropdown if clicking outside
+  document.addEventListener("click", () => {
+    const dropdown = document.getElementById("sampleDropdown");
+    if (dropdown) dropdown.style.display = "none";
+  }, { once: true });
+
+  // Sample selection
+  document.getElementById("sampleDropdown").addEventListener("click", (e) => {
+    const btn = e.target.closest(".sample-option");
+    if (!btn) return;
+    const id = btn.dataset.sampleId;
+    const sample = STACKS_SAMPLES.find(s => s.id === id);
+    if (!sample) return;
     try {
-      const pkg = loadDefaultPackage();
-      store.set(pkg);
+      store.set(structuredClone(sample));
       renderMain();
       bindMainEvents();
     } catch (err) {
@@ -82,9 +115,11 @@ function renderMain() {
     <header class="main-header">
       <div class="header-inner">
         <div class="header-left">
-          <span class="app-name">Stacks</span>
-          <span class="collection-name">${esc(state.meta.name)}</span>
-          <span class="record-count" id="recordCount">${state.data.records.length}</span>
+          <span class="header-app-name">Stacks</span>
+          <span class="header-sep">·</span>
+          <span class="header-collection">${esc(state.meta.name)}</span>
+          <span class="header-sep">·</span>
+          <span class="header-count" id="recordCount">${state.data.records.length} records</span>
         </div>
         <div class="header-right">
           <button class="btn-small" id="exportBackupBtn">Export Full Backup</button>
@@ -97,11 +132,13 @@ function renderMain() {
     <div class="main-body">
 
       ${renderWarningsBanner(state.warnings)}
+      ${renderSessionToast()}
 
       <div class="toolbar">
         <div class="search-wrap">
           <input class="search-input" id="searchInput" placeholder="Search…" autocomplete="off" value="${esc(_searchQuery)}">
         </div>
+        ${renderSortDropdown(schema)}
         <button class="btn-primary" id="addBtn">+ Add</button>
       </div>
 
@@ -118,6 +155,7 @@ function renderMain() {
 
       <div class="card-list" id="cardList"></div>
       <div class="empty-state" id="emptyState" style="display:none">No records found.</div>
+      <div class="pagination" id="pagination"></div>
 
     </div>
   `;
@@ -129,6 +167,7 @@ function bindMainEvents() {
   // Search
   document.getElementById("searchInput").addEventListener("input", (e) => {
     _searchQuery = e.target.value;
+    _currentPage = 1;
     renderCards();
   });
 
@@ -137,8 +176,18 @@ function bindMainEvents() {
     const tab = e.target.closest(".filter-tab");
     if (!tab) return;
     _activeFilter = tab.dataset.filter;
+    _currentPage = 1;
     document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
+    renderCards();
+  });
+
+  // Sort
+  document.getElementById("sortSelect").addEventListener("change", (e) => {
+    const [key, dir] = e.target.value.split("|");
+    _sortKey = key;
+    _sortDir = dir;
+    _currentPage = 1;
     renderCards();
   });
 
@@ -184,14 +233,54 @@ function bindMainEvents() {
 
   // Unload
   document.getElementById("unloadBtn").addEventListener("click", () => {
-    if (!confirm("Unload this collection? Make sure you have exported a backup first.")) return;
+    if (!confirm("Unload this collection? Make sure you have exported a backup first — any changes made this session will be lost.")) return;
     store.clear();
-    _searchQuery = "";
+    _searchQuery  = "";
     _activeFilter = "all";
-    _editingId = null;
+    _editingId    = null;
+    _currentPage  = 1;
+    _sortKey      = "created_at";
+    _sortDir      = "desc";
     renderLanding();
     bindLandingEvents();
   });
+
+  bindSessionToast();
+}
+
+// ══════════════════════════════════════════════
+// SORT
+// ══════════════════════════════════════════════
+
+function renderSortDropdown(schema) {
+  const dateOptions = `
+    <option value="created_at|desc" ${_sortKey === "created_at" && _sortDir === "desc" ? "selected" : ""}>Date added (newest)</option>
+    <option value="created_at|asc"  ${_sortKey === "created_at" && _sortDir === "asc"  ? "selected" : ""}>Date added (oldest)</option>
+  `;
+
+  const fieldOptions = schema.fields.map(f => {
+    if (f.type === "list") {
+      return `<option disabled>${esc(f.name)} (not sortable)</option>`;
+    }
+    if (!f.sortable) return "";
+    if (f.type === "number") {
+      return `
+        <option value="${esc(f.id)}|asc"  ${_sortKey === f.id && _sortDir === "asc"  ? "selected" : ""}>${esc(f.name)} (asc)</option>
+        <option value="${esc(f.id)}|desc" ${_sortKey === f.id && _sortDir === "desc" ? "selected" : ""}>${esc(f.name)} (desc)</option>
+      `;
+    }
+    return `
+      <option value="${esc(f.id)}|asc"  ${_sortKey === f.id && _sortDir === "asc"  ? "selected" : ""}>${esc(f.name)} (A–Z)</option>
+      <option value="${esc(f.id)}|desc" ${_sortKey === f.id && _sortDir === "desc" ? "selected" : ""}>${esc(f.name)} (Z–A)</option>
+    `;
+  }).join("");
+
+  return `
+    <select class="sort-select" id="sortSelect">
+      ${dateOptions}
+      ${fieldOptions}
+    </select>
+  `;
 }
 
 // ══════════════════════════════════════════════
@@ -204,19 +293,52 @@ function renderCards() {
   const query = _searchQuery.trim();
   const filtered = state.data.records.filter(r => matchesSearch(r, query, _activeFilter, schema));
 
-  document.getElementById("recordCount").textContent = state.data.records.length;
+  const countEl = document.getElementById("recordCount");
+  if (countEl) countEl.textContent = state.data.records.length + " records";
 
-  const list = document.getElementById("cardList");
+  const list  = document.getElementById("cardList");
   const empty = document.getElementById("emptyState");
 
   if (filtered.length === 0) {
     list.innerHTML = "";
     empty.style.display = "block";
+    document.getElementById("pagination").innerHTML = "";
     return;
   }
 
   empty.style.display = "none";
-  list.innerHTML = filtered.map(record => renderCard(record, schema, query)).join("");
+
+  // Sort
+  const sorted = [...filtered].sort((a, b) => {
+    let aVal, bVal;
+    if (_sortKey === "created_at" || _sortKey === "updated_at") {
+      aVal = a[_sortKey] || "";
+      bVal = b[_sortKey] || "";
+    } else {
+      aVal = a.fields[_sortKey] ?? "";
+      bVal = b.fields[_sortKey] ?? "";
+    }
+    if (typeof aVal === "number" && typeof bVal === "number") {
+      return _sortDir === "asc" ? aVal - bVal : bVal - aVal;
+    }
+    aVal = String(aVal).toLowerCase();
+    bVal = String(bVal).toLowerCase();
+    if (aVal < bVal) return _sortDir === "asc" ? -1 : 1;
+    if (aVal > bVal) return _sortDir === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  // Paginate
+  const totalPages = _pageSize === 0 ? 1 : Math.ceil(sorted.length / _pageSize);
+  if (_currentPage > totalPages) _currentPage = totalPages;
+
+  const paginated = _pageSize === 0
+    ? sorted
+    : sorted.slice((_currentPage - 1) * _pageSize, _currentPage * _pageSize);
+
+  list.innerHTML = paginated.map(record => renderCard(record, schema, query)).join("");
+
+  renderPagination(sorted.length, totalPages);
 }
 
 function renderCard(record, schema, query) {
@@ -255,6 +377,62 @@ function renderCard(record, schema, query) {
       </div>
     </div>
   `;
+}
+
+// ══════════════════════════════════════════════
+// PAGINATION
+// ══════════════════════════════════════════════
+
+function renderPagination(totalFiltered, totalPages) {
+  const container = document.getElementById("pagination");
+
+  const pageInfo = _pageSize === 0
+    ? `Showing all ${totalFiltered} records`
+    : `Page ${_currentPage} of ${totalPages} · ${totalFiltered} records`;
+
+  const prevDisabled = _currentPage <= 1 || _pageSize === 0;
+  const nextDisabled = _currentPage >= totalPages || _pageSize === 0;
+
+  container.innerHTML = `
+    <div class="pagination-inner">
+      <div class="pagination-controls">
+        <button class="btn-small" id="prevPageBtn" ${prevDisabled ? "disabled" : ""}>← Prev</button>
+        <span class="pagination-info">${pageInfo}</span>
+        <button class="btn-small" id="nextPageBtn" ${nextDisabled ? "disabled" : ""}>Next →</button>
+      </div>
+      <div class="pagination-size">
+        <label for="pageSizeSelect">Per page</label>
+        <select id="pageSizeSelect">
+          <option value="10"  ${_pageSize === 10  ? "selected" : ""}>10</option>
+          <option value="25"  ${_pageSize === 25  ? "selected" : ""}>25</option>
+          <option value="50"  ${_pageSize === 50  ? "selected" : ""}>50</option>
+          <option value="0"   ${_pageSize === 0   ? "selected" : ""}>All</option>
+        </select>
+      </div>
+    </div>
+  `;
+
+  if (!prevDisabled) {
+    document.getElementById("prevPageBtn").addEventListener("click", () => {
+      _currentPage--;
+      renderCards();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  if (!nextDisabled) {
+    document.getElementById("nextPageBtn").addEventListener("click", () => {
+      _currentPage++;
+      renderCards();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  document.getElementById("pageSizeSelect").addEventListener("change", (e) => {
+    _pageSize = parseInt(e.target.value);
+    _currentPage = 1;
+    renderCards();
+  });
 }
 
 // ══════════════════════════════════════════════
@@ -423,6 +601,35 @@ function renderWarningsBanner(warnings) {
       <ul>${warnings.map(w => `<li>${esc(w)}</li>`).join("")}</ul>
     </div>
   `;
+}
+
+function renderSessionToast() {
+  return `
+    <div class="session-toast" id="sessionToast">
+      <span><strong>Stacks</strong> — your changes live in this tab. Export a backup before you go.</span>
+      <button class="session-toast-close" id="sessionToastClose" title="Dismiss">✕</button>
+    </div>
+  `;
+}
+
+function bindSessionToast() {
+  const toast = document.getElementById("sessionToast");
+  const close = document.getElementById("sessionToastClose");
+  if (!toast || !close) return;
+
+  // Auto-dismiss after 6 seconds
+  const timer = setTimeout(() => dismissToast(toast), 6000);
+
+  close.addEventListener("click", () => {
+    clearTimeout(timer);
+    dismissToast(toast);
+  });
+}
+
+function dismissToast(toast) {
+  toast.style.opacity = "0";
+  toast.style.transition = "opacity 0.4s";
+  setTimeout(() => toast.remove(), 400);
 }
 
 function showError(message) {
