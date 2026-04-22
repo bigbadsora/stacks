@@ -17,6 +17,8 @@ Because it's a static file, Stacks works:
 - Hosted on any static host (GitHub Pages, S3, Netlify)
 - Offline, with no internet connection required
 
+**A note on saving:** Stacks has no server and runs entirely in your browser. Changes you make during a session are held in memory — they are not automatically written anywhere. Always export a backup before closing the tab.
+
 ---
 
 ## Getting started
@@ -40,7 +42,7 @@ A Stacks package is a `.zip` file containing four files:
 
 ### schema.yaml
 
-Defines up to 10 fields for your collection. Each field has an `id` (machine readable), a `name` (display label), a `type`, and a `required` flag.
+Defines up to 10 fields for your collection. Each field has an `id` (machine readable), a `name` (display label), a `type`, a `required` flag, and an optional `sortable` flag.
 
 Valid types: `string`, `number`, `list`
 
@@ -54,17 +56,34 @@ fields:
     name: "Title"
     type: "string"
     required: true
+    sortable: true
 
   - id: "author"
     name: "Author"
     type: "string"
     required: true
+    sortable: true
+
+  - id: "year"
+    name: "Year"
+    type: "number"
+    required: false
+    sortable: true
 
   - id: "themes"
     name: "Themes"
     type: "list"
     required: false
 ```
+
+**Field attributes:**
+- `id` — machine readable, alphanumeric and hyphens only, e.g. `appears-in`
+- `name` — human readable display label
+- `type` — `string`, `number`, or `list` (a list of strings)
+- `required` — boolean, defaults to false
+- `sortable` — boolean, defaults to false. Has no effect on `list` fields.
+
+The first field in the list is treated as the title of each record. The second field is treated as the subtitle. Both are displayed prominently on cards.
 
 ### data.json
 
@@ -83,6 +102,7 @@ An array of records that conform to the schema. Top level metadata is generated 
       "fields": {
         "title": "The Lottery",
         "author": "Shirley Jackson",
+        "year": 1948,
         "themes": ["ritual", "violence", "community"]
       }
     }
@@ -92,12 +112,30 @@ An array of records that conform to the schema. Top level metadata is generated 
 
 ---
 
+## Creating a zip package
+
+A Stacks package is a zip file containing all four files at the root level — not inside a subfolder.
+
+**On macOS:** Select all four files, right-click, and choose Compress. Do not compress the containing folder — this will wrap the files in a subdirectory and the package will fail to import.
+
+**On Windows:** Select all four files, right-click, and choose Send to → Compressed (zipped) folder.
+
+---
+
 ## Exporting
 
 There are two export options:
 
-- **Export Full Backup** — exports a complete package zip with your data and configuration. Use this for personal backups.
+- **Export Full Backup** — exports a complete package zip with your data and configuration. Use this to save your work.
 - **Export Shareable Environment** — exports schema, theme, and meta only, with no data. Use this to share your collection setup as a preset for others.
+
+---
+
+## Searching and sorting
+
+The search bar searches across all fields by default. Use the filter tabs to scope your search to a specific field.
+
+Records can be sorted using the sort dropdown in the toolbar. Sort options are generated from whichever fields have `sortable: true` in your schema. Date added (newest/oldest) is always available regardless of schema.
 
 ---
 
@@ -118,8 +156,8 @@ Both are included in the `vendor/` folder. No installation or package manager re
 
 ```
 stacks/
-├── index.html          # the entire application
-├── vendor/             # vendored dependencies (not included, see above)
+├── index.html          # application shell and script tags
+├── vendor/             # vendored dependencies
 │   ├── jszip.min.js
 │   └── js-yaml.min.js
 ├── src/
@@ -129,7 +167,8 @@ stacks/
 │   ├── store.js        # in-memory state
 │   ├── import.js       # zip import and parsing
 │   ├── export.js       # zip export
-│   └── ui.js           # rendering and DOM
+│   ├── ui.js           # rendering and DOM
+│   └── styles.css      # all styles
 └── default/            # reference files (not loaded at runtime)
     ├── meta.yaml
     ├── schema.yaml
@@ -141,11 +180,7 @@ stacks/
 
 ## Roadmap
 
-- [ ] Theming support via `theme.yaml`
-- [ ] Schema editor in the UI
-- [ ] CSV export
-- [ ] Configurable field limit
-- [ ] Title/subtitle field configuration
+See [ROADMAP.md](ROADMAP.md) for the full list of planned features and known issues.
 
 ---
 
