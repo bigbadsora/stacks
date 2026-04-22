@@ -86,9 +86,11 @@ function renderMain() {
     <header class="main-header">
       <div class="header-inner">
         <div class="header-left">
-          <span class="app-name">Stacks</span>
-          <span class="collection-name">${esc(state.meta.name)}</span>
-          <span class="record-count" id="recordCount">${state.data.records.length}</span>
+          <span class="header-app-name">Stacks</span>
+          <span class="header-sep">·</span>
+          <span class="header-collection">${esc(state.meta.name)}</span>
+          <span class="header-sep">·</span>
+          <span class="header-count" id="recordCount">${state.data.records.length} records</span>
         </div>
         <div class="header-right">
           <button class="btn-small" id="exportBackupBtn">Export Full Backup</button>
@@ -259,7 +261,8 @@ function renderCards() {
   const query = _searchQuery.trim();
   const filtered = state.data.records.filter(r => matchesSearch(r, query, _activeFilter, schema));
 
-  document.getElementById("recordCount").textContent = state.data.records.length;
+  const countEl = document.getElementById("recordCount");
+  if (countEl) countEl.textContent = state.data.records.length + " records";
 
   const list  = document.getElementById("cardList");
   const empty = document.getElementById("emptyState");
